@@ -11,6 +11,11 @@ nconf
         configObject.key = configObject.key.replace(PREFIX, '')
         return configObject
       }
+      if(configObject.value === 'true') {
+        configObject.value = true
+      } else if(configObject.value === 'false') {
+        configObject.value = false
+      }
     },
     separator : '_'
   })

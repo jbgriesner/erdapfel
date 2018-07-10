@@ -20,11 +20,11 @@ function App(config) {
 
   app.use(express.static(`${__dirname}/../public`))
   app.get('/*', (req, res) => {
-    res.render('index', {config : config})
+    res.render('index', {config})
   })
 
   app.use((error, req, res, next) => {
-    res.status(500).render('error', {error})
+    res.status(500).render('error', {error, config})
   })
 }
 

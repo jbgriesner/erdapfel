@@ -9,7 +9,7 @@
 <div class="error__content">
   <h1>500</h1>
   <h3>An error occurred (Ça ne tourne pas rond)</h3>
-  <% if(error && error.message) { %>
+  <% if(error && error.message && config.system.showError) { %>
     <% error.message.split('\n').forEach((message) => { %>
       <p><%= message %></p>
     <% }) %>

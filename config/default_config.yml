@@ -12,6 +12,7 @@ system:
   baseUrl: /
   timeout: 3
   evalFiles: false
+  showError: false
 
 # Store
 store:
