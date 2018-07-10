@@ -44,7 +44,6 @@ test('click on a poi', async () => {
   expect(poiPanel).not.toBeFalsy()
 
   const translatedSubClass = await getText(page, '.poi_panel__description')
-  console.log(translatedSubClass)
   expect(translatedSubClass).toEqual('musée')
 })
 

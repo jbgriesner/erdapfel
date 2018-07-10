@@ -13,7 +13,13 @@ Error.prototype.showMessage = async function (message) {
   this.message = message
   await this.panel.update()
   await this.panel.animate( .25, '.error_panel', {top:'0px'})
-  await this.panel.wait(3)
+  await this.panel.wait(300)
+  await this.panel.animate(.25, '.error_panel', {top:'-100px'})
+  this.message = ''
+  this.panel.update()
+}
+
+Error.prototype.close = async function () {
   await this.panel.animate(.25, '.error_panel', {top:'-100px'})
   this.message = ''
   this.panel.update()

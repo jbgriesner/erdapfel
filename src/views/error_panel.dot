@@ -1,3 +1,7 @@
 <div class="error_panel">
   {{= this.message }}
+  <button class="error_panel__close" {{= click(this.close, this) }}>
+    <i class="icon-x"></i>
+  </button>
 </div>
+

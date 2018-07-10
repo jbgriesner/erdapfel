@@ -10,3 +10,16 @@
   color: #721c24;
   background-color: #f8d7da;
 }
+
+.error_panel__close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+}
+
+.error_panel__close:hover {
+  color: #721c24;
+}
