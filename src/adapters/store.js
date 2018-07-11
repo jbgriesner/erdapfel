@@ -5,8 +5,6 @@ const AbStore = require(`../libs/${moduleConfig.name}`)
 const abstractStore = new AbStore(moduleConfig.endpoint)
 
 function Store() {
-  this.isRegisterd = false
-
   listen('store_poi', (poi) => {
     this.add(poi)
   })
@@ -30,12 +28,14 @@ Store.prototype.getAll = async function() {
 }
 
 Store.prototype.isRegistered = async function () {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     abstractStore.getAll()
       .then(() => resolve(true))
       .catch((e) => {
       if(e.message === 'UNREGISTERED') {
         resolve(false)
+      } else {
+        reject(e)
       }
     })
   })

@@ -19,6 +19,11 @@ function App(config) {
   app.use(gettext)
 
   app.use(express.static(`${__dirname}/../public`))
+
+  app.get('/elk', (req, res) => {
+    res.json({test:true})
+  })
+
   app.get('/*', (req, res) => {
     res.render('index', {config})
   })

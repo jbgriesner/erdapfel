@@ -6,6 +6,8 @@ services:
     url: override by environment
   idunn:
     url: override by environment
+  elk:
+    url: override by environment
 
 # System
 system:
