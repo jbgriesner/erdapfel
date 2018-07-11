@@ -98,13 +98,16 @@ const mapJsChunkConfig = {
   optimization: {
     minimizer: [
       new UglifyWebpackPlugin({
-        exclude : /mapbox-gl/,
+        uglifyOptions : {
+          compress : {
+            comparisons : false
+          }
+        }
       })
     ]
   },
 
   module: {
-
     rules: [{
       test: /\.yml$/,
       use: [
