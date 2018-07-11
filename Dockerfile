@@ -11,7 +11,7 @@ WORKDIR $PROJECT_DIR
 
 FROM base as builder
 COPY . $PROJECT_DIR
-RUN npm install && npm run-script build
+RUN npm install && npm run-script build -- --mode=production
 
 ###########################################################
 

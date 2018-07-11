@@ -1,6 +1,7 @@
 const path = require('path')
 const yaml = require('node-yaml')
 const webpack = require('webpack')
+const UglifyWebpackPlugin = require('uglifyjs-webpack-plugin')
 const testMode = process.env.TEST === 'true'
 
 console.log('*--------------------*')
@@ -14,31 +15,35 @@ const sassChunkConfig = {
       filename: 'tmp/css.js'
     },
     module : {
-      loaders : [{
-        loader : 'file-loader',
-        options: {
-          name : 'public/css/app.css'
+      rules : [{
+        use : {
+          loader: 'file-loader',
+          options: {
+            name: 'public/css/app.css'
+          }
         }
       }, {
         test : /\.scss$/,
-        loader : 'postcss-loader',
+        use : {loader: 'postcss-loader',
         options : {
           plugins: [
             require('autoprefixer')({})
           ]
-
+        }
         }
       }, {
         test: /\.(jpe?g|png|gif|svg)$/,
-        loader: 'file-loader',
-        options: {
-          publicPath: '/',
-          name: '[name].[ext]',
-          outputPath: 'images/'
+        use: {
+          loader: 'file-loader',
+          options: {
+            publicPath: '/',
+            name: '[name].[ext]',
+            outputPath: 'images/'
+          }
         }
       }, {
         test : /\.scss$/,
-        loader : 'sass-loader'
+        use : 'sass-loader'
       }],
     },
   }
@@ -51,18 +56,16 @@ const mainJsChunkConfig = {
   },
 
   module: {
-    loaders: [{
+    rules: [{
       test: /\.dot/,
-      use: [
-        {loader : 'dot-loader'}
-      ]
+      use: 'dot-loader'
     }, {
       test: /\.yml$/,
       exclude: [path.resolve(__dirname, '../node_modules/@qwant/')],
       use: [
-        {loader : '@qwant/config-sanitizer-loader'},
-        {loader : 'json-loader'},
-        {loader : 'yaml-loader'}
+        '@qwant/config-sanitizer-loader',
+        'json-loader',
+        'yaml-loader'
       ]
     }, {
       test: /\.js$/,
@@ -91,19 +94,26 @@ const mapJsChunkConfig = {
       }
     })
   ],
+
+  optimization: {
+    minimizer: [
+      new UglifyWebpackPlugin({
+        exclude : /mapbox-gl/,
+      })
+    ]
+  },
+
   module: {
-    loaders: [{
+
+    rules: [{
       test: /\.yml$/,
       use: [
-        {loader : 'json-loader'},
-        {loader : 'yaml-loader'}
+        'json-loader',
+        'yaml-loader'
       ]
     }, {
       test : /style\.json$/,
       use : [
-        {
-          loader : 'json-loader'
-        },
         {
           loader : '@qwant/map-style-loader',
           options : {
@@ -115,11 +125,6 @@ const mapJsChunkConfig = {
           }
         }
       ],
-    }, {
-      test: /\.js$/,
-      exclude: [
-        /\/node_modules/
-      ]
     }]
   },
   devtool: 'source-map'
@@ -132,7 +137,7 @@ webpackChunks = webpackChunks.concat(constants.languages.supportedLanguages.map(
   return {
     entry:  path.join(__dirname, '..', 'language', 'message', language.locale + '.po'),
     module : {
-      loaders : [
+      rules : [
          {
           loader :'@qwant/merge-i18n-source-loader',
           options : {
@@ -146,15 +151,16 @@ webpackChunks = webpackChunks.concat(constants.languages.supportedLanguages.map(
         },
         {
           test : /\.po$/,
-          loader: '@qwant/merge-po-loader',
-          options: {
-            fallbackList : language.fallback,
-            messagePath : path.join(__dirname, '..', 'language', 'message'),
-            locale: language.locale
+          use : {
+            loader: '@qwant/merge-po-loader',
+            options: {
+              fallbackList: language.fallback,
+              messagePath: path.join(__dirname, '..', 'language', 'message'),
+              locale: language.locale
+            }
           }
         }],
     },
-
     output : {
       path : path.join(__dirname, '..'),
       filename : `./public/build/javascript/message/${language.locale}.js`
