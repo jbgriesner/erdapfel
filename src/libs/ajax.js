@@ -1,14 +1,27 @@
 import nconf from '@qwant/nconf-getter'
 const systemConfigs = nconf.get().system
 const timeout = systemConfigs.timeout
-function Ajax() {}
+
+function Ajax() {
+  this.onError = false
+}
+
+if(window.__ajax) {
+  window.__ajax = new Ajax()
+}
 
 Ajax.queryLang = async (url, data = {}, options) => {
+  if(window.__ajax.onError) {
+    return
+  }
   data.lang = getLang().code
   return Ajax.query(url, data, options)
 }
 
 Ajax.query = async (url, data, options = {method : 'GET'}) => {
+  if(window.__ajax.onError) {
+    return
+  }
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
     let jsonResponse
@@ -45,4 +58,4 @@ const dataToUrl = (data) =>
     .map(itemKey => `${encodeURIComponent(itemKey)}=${encodeURIComponent(data[itemKey])}`)
     .join('&')
 
-export default Ajax
+export default window.__ajax

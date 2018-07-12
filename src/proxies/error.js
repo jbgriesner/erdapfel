@@ -9,20 +9,30 @@ function Error() {
   this.storeAvailable = true
 }
 
+/* global webpack singleton */
 if(!window.__error) {
   window.__error = new Error()
 }
 
-Error.prototype.setNetworkError = function(status) {
-  fire('error_h', message)
-  this.log(message)
+Error.prototype.setNetworkError = function(error) {
+  this.networkAvailable = true
+  fire('error_h', error)
+  this.log(error)
 }
 
-Error.prototype.setStoreError = function (status) {
-  
+Error.prototype.clearNetworkError = function(error) {
+  this.networkAvailable = true
+  fire('error_h', error)
+  this.log(error)
 }
 
-Error.prototype.setNetworkError = function(message) {
+Error.prototype.setStoreError = function (error) {
+  this.storeAvailable = true
+  fire('error_h', error)
+  this.log(error)
+}
+
+Error.prototype.clearStoreError = function(message) {
   fire('error_h', message)
   this.log(message)
 }
