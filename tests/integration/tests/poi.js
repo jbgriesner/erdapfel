@@ -1,24 +1,15 @@
-import puppeteer from 'puppeteer'
-import {getText} from '../tools'
 const configBuilder = require('@qwant/nconf-builder')
 const config = configBuilder.get()
 const APP_URL = `http://localhost:${config.PORT}`
+import {initBrowser, getText} from '../tools'
+
 let browser
 let page
 
 beforeAll(async () => {
-  try {
-    browser = await puppeteer.launch()
-    page = await browser.newPage()
-    await page.setExtraHTTPHeaders({
-      'accept-language': 'fr_FR,fr,en;q=0.8' /* force fr header */
-    })
-    page.on('console', msg => {
-      console.log(`> ${msg.text()}`)
-    })
-  } catch (error) {
-    console.error(error)
-  }
+  let browserPage = await initBrowser()
+  page = browserPage.page
+  browser = browserPage.browser
 })
 
 test('click on a poi', async () => {

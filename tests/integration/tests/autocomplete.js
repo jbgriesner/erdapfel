@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer'
-import {wait} from '../tools'
+import {initBrowser, wait} from '../tools'
 const configBuilder = require('@qwant/nconf-builder')
 const config = configBuilder.get()
 const APP_URL = `http://localhost:${config.PORT}`
@@ -8,15 +8,9 @@ let browser
 let page
 
 beforeAll(async () => {
-  try {
-    browser = await puppeteer.launch()
-    page = await browser.newPage()
-    page.on('console', msg => {
-      console.log(`> ${msg.text()}`)
-    })
-  } catch (error) {
-    console.error(error)
-  }
+  let browserPage = await initBrowser()
+  page = browserPage.page
+  browser = browserPage.browser
 })
 
 test('key press',async () => {
