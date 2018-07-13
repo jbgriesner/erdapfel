@@ -1,4 +1,3 @@
-import puppeteer from 'puppeteer'
 import {initBrowser, wait} from '../tools'
 const configBuilder = require('@qwant/nconf-builder')
 const config = configBuilder.get()
@@ -10,6 +9,16 @@ let page
 beforeAll(async () => {
   let browserPage = await initBrowser()
   page = browserPage.page
+  await page.setRequestInterception(true)
+  page.on('request', interceptedRequest => {
+    if(interceptedRequest.url().match(/autocomplete/)) {
+      interceptedRequest.headers['Access-Control-Allow-Origin'] = '*'
+      const mockAutocomplete = require('../../__data__/autocomplete')
+      interceptedRequest.respond({body : JSON.stringify(mockAutocomplete), headers  : interceptedRequest.headers})
+    } else {
+      interceptedRequest.continue()
+    }
+  })
   browser = browserPage.browser
 })
 
@@ -19,7 +28,6 @@ test('key press',async () => {
   await page.keyboard.type('Hello')
   let cleanHandle = await page.waitForSelector('#clear_button')
   expect(cleanHandle).not.toBeNull()
-
   /* check input content */
   let searchValueHandle = await page.evaluateHandle(() => { return document.querySelector('#search').value === 'Hello' })
   expect(searchValueHandle._remoteObject.value).toBeTruthy()
@@ -27,16 +35,6 @@ test('key press',async () => {
 
 test('simple_word', async () => {
   expect.assertions(1)
-  await page.setRequestInterception(true)
-  const mockAutocomplete = require('../../__mocks__/autocomplete')
-  page.on('request', interceptedRequest => {
-    if(interceptedRequest.url().match(/autocomplete/)) {
-      interceptedRequest.headers['Access-Control-Allow-Origin'] = '*'
-      interceptedRequest.respond({body : JSON.stringify(mockAutocomplete), headers  : interceptedRequest.headers})
-    } else {
-      interceptedRequest.continue()
-    }
-  })
   await page.goto(APP_URL)
   await page.keyboard.type('test')
   await wait(100)
