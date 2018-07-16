@@ -11,7 +11,6 @@ const mockAutocomplete = require('../../__mocks__/autocomplete')
 beforeAll(async () => {
   try {
     browser = await puppeteer.launch()
-    //browser = await puppeteer.launch({headless: false})
     page = await browser.newPage()
     await page.setRequestInterception(true)
     page.on('request', interceptedRequest => {
@@ -67,7 +66,7 @@ test('move to on click', async () => {
   })
   await page.keyboard.type('Hello')
   await page.waitForSelector('.autocomplete_suggestion')
-  await page.click('body > div.autocomplete_suggestions > div:nth-child(3)')
+  await page.click('.autocomplete_suggestion:nth-child(3)')
   let map_position_after = await page.evaluate(() => {
     return window.MAP_MOCK.center
   })
