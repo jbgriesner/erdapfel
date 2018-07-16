@@ -1,22 +1,25 @@
-import puppeteer from 'puppeteer'
 const configBuilder = require('@qwant/nconf-builder')
 const config = configBuilder.get()
 const APP_URL = `http://localhost:${config.PORT}`
-import {wait} from '../tools'
+import {initBrowser, wait} from '../tools'
 
 let browser
 let page
 
 beforeAll(async () => {
-  try {
-    browser = await puppeteer.launch()
-    page = await browser.newPage()
-    page.on('console', msg => {
-      console.log(`> ${msg.text()}`)
-    })
-  } catch (error) {
-    console.error(error)
-  }
+  let browserPage = await initBrowser()
+  page = browserPage.page
+  browser = browserPage.browser
+  await page.setRequestInterception(true)
+  page.on('request', interceptedRequest => {
+    if(interceptedRequest.url().match(/poi/)) {
+      interceptedRequest.headers['Access-Control-Allow-Origin'] = '*'
+      const poiMock = require('../../__mocks__/poi')
+      interceptedRequest.respond({body: JSON.stringify(poiMock), headers: interceptedRequest.headers})
+    } else {
+      interceptedRequest.continue()
+    }
+  })
 })
 
 test('toggle favorite', async () => {
@@ -34,6 +37,27 @@ test('toggle favorite', async () => {
 })
 
 test('add favorite', async () => {
+  expect.assertions(1)
+  await page.goto(APP_URL)
+  page.evaluate(() => {
+    fire('store_poi', {name : 'Poi name', getKey : () => {return 1}, store: () => {return {id: 1}}}) /* minimal poi */
+  })
+  await page.click('.side_bar__fav')
+  await wait(100)
+  let items = await  page.waitForSelector('.favorite_panel__item')
+  expect(items).not.toBeNull()
+})
+
+test('add favorite from poi', async () => {
+  expect.assertions(1)
+  await page.goto(`${APP_URL}/place/osm:test`)
+  await page.click('.side_bar__fav')
+  await wait(100)
+  let items = await  page.waitForSelector('.favorite_panel__item')
+  expect(items).not.toBeNull()
+})
+
+test('manage favorite from poi', async () => {
   expect.assertions(1)
   await page.goto(APP_URL)
   page.evaluate(() => {
@@ -65,5 +89,5 @@ test('remove favorite', async () => {
 })
 
 afterAll(() => {
-  browser.close()
+  //browser.close()
 })
