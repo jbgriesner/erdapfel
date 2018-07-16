@@ -54,7 +54,7 @@ Scene.prototype.initMapBox = function () {
           if(globalId) {
             let poi = await Poi.apiLoad(globalId)
             if(poi) {
-              if(e.originalEvent.clientX < DESKTOP_PANEL_WIDTH && window.innerWidth > layout.mobile.breakPoint) {
+              if(e.originalEvent.clientX < (layout.sizes.sideBarWidth + layout.sizes.panelWidth) && window.innerWidth > layout.mobile.breakPoint) {
                 this.mb.flyTo({center : e.lngLat, offset : [(layout.sizes.panelWidth + layout.sizes.sideBarWidth) / 2, 0]})
               }
               poi.zoom = this.mb.getZoom()
